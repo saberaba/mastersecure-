@@ -18,12 +18,30 @@ jobs:
       with:
         node-version: 20
 
-    - name: Initialize Package & Install Capacitor
+    - name: Force Create Package & Install Tools
       run: |
         npm init -y
-        npm install @capacitor/cli @capacitor/core @capacitor/android
+        npm install @capacitor/core @capacitor/cli @capacitor/android
 
-    - name: Initialize Android Platform
+    - name: Force Initialize Capacitor Config
+      run: |
+        cat <<EOF > capacitor.config.json
+        {
+          "appId": "com.mastersecure.premium",
+          "appName": "MasterSecure",
+          "webDir": "www",
+          "bundledWebRuntime": false
+        }
+        EOF
+
+    - name: Create Empty Project Structure if Missing
+      run: |
+        mkdir -p www
+        if [ ! -f www/index.html ]; then
+          echo "<h1>MasterSecure Premium</h1>" > www/index.html
+        fi
+
+    - name: Add Android Platform
       run: |
         npx cap add android
         npx cap sync android
@@ -34,6 +52,16 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
+    - name: Build Android APK (Debug)
+      run: |
+        cd android
+        ./gradlew assembleDebug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MasterSecure-APK
+        path: android/app/build/outputs/apk/debug/app-debug.apk
     - name: Build Android APK (Debug)
       run: |
         cd android
