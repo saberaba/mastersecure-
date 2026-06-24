@@ -1,0 +1,6 @@
+{
+  "appId": "com.mastersecure.premium",
+  "appName": "MasterSecure",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
